@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "javascript-calc load test",
+    "description": "RAM / throttle test for single-node vs master-node.\n\nSetup:\n1. Import this collection.\n2. Edit the collection variable `base_url` (Collection > Variables) to your deployed URL, e.g. https://javascript-calc-master-xxxx.kuberns.site (no trailing slash).\n3. Baseline: Send `stats` once, note peakRssMB + uptimeSec.\n4. Load: open Runner > Performance tab, pick the `work` request, set Virtual Users (10 -> 25 -> 50 -> 100 -> 200 ...) and 1 min duration, Run.\n5. Watch error % in Postman. Re-send `stats` to read peakRssMB and uptimeSec.\n   - error % climbing above 0 = concurrency it can't survive.\n   - uptimeSec dropping back near 0 = container OOM-killed & restarted = hard breaking point.\n6. Repeat identically against the other architecture's URL and compare.\n\nDial pressure with the `work` query params: mb (MB per request), hold (ms in-flight), cpu (CPU passes). Live RAM ~= virtualUsers x mb while requests overlap.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://REPLACE-WITH-YOUR-URL.kuberns.site",
+      "type": "string"
+    },
+    {
+      "key": "mb",
+      "value": "15",
+      "type": "string"
+    },
+    {
+      "key": "hold",
+      "value": "300",
+      "type": "string"
+    },
+    {
+      "key": "cpu",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "stats (read RAM + uptime)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/stats",
+          "host": ["{{base_url}}"],
+          "path": ["stats"]
+        },
+        "description": "Current + peak RAM of the app process and uptime. peakRssMB = how high RAM climbed. If uptimeSec suddenly resets near 0, the container was OOM-killed & restarted under load."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Surface the key numbers in the Postman test results + console.",
+              "let body = {};",
+              "try { body = pm.response.json(); } catch (e) {}",
+              "pm.test('reachable (200)', function () { pm.response.to.have.status(200); });",
+              "if (body && typeof body.rssMB !== 'undefined') {",
+              "  pm.test('rssMB = ' + body.rssMB, function () { pm.expect(true).to.be.true; });",
+              "  pm.test('peakRssMB = ' + body.peakRssMB, function () { pm.expect(true).to.be.true; });",
+              "  pm.test('uptimeSec = ' + body.uptimeSec, function () { pm.expect(true).to.be.true; });",
+              "  console.log('RAM now=' + body.rssMB + 'MB  peak=' + body.peakRssMB + 'MB  uptime=' + body.uptimeSec + 's');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "work (load-test endpoint)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/work?mb={{mb}}&hold={{hold}}&cpu={{cpu}}",
+          "host": ["{{base_url}}"],
+          "path": ["work"],
+          "query": [
+            { "key": "mb", "value": "{{mb}}", "description": "MB of real RAM allocated per request" },
+            { "key": "hold", "value": "{{hold}}", "description": "ms the request stays in-flight (raises overlap/pressure)" },
+            { "key": "cpu", "value": "{{cpu}}", "description": "CPU passes over the buffer per request" }
+          ]
+        },
+        "description": "Allocates mb MB, does cpu CPU passes, holds hold ms, then responds. Run this via Runner > Performance with rising Virtual Users to find the breaking point. Each response also reports rssMB."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('served (200)', function () { pm.response.to.have.status(200); });",
+              "let body = {};",
+              "try { body = pm.response.json(); } catch (e) {}",
+              "if (body && typeof body.rssMB !== 'undefined') {",
+              "  pm.test('app rssMB = ' + body.rssMB, function () { pm.expect(true).to.be.true; });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "ping (control, no work)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/ping",
+          "host": ["{{base_url}}"],
+          "path": ["ping"]
+        },
+        "description": "No-work liveness endpoint. Use as a control: if /ping stays fast/200 while /work fails, the failure is work/RAM-driven, not the server being down."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('alive (200)', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
