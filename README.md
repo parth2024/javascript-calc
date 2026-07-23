@@ -18,7 +18,7 @@ A simple calculator built using vanilla HTML, CSS and JavaScript..
 
 - By keep pressing the equal operator will recalculate result based on the last operation.
 
-- Last operation will show up above the input box every time any of the operators is selected.
+- Last operation will show up above the input box every time any of the operators is selected..
 
 ## Demo
 
