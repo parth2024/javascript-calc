@@ -6,7 +6,7 @@
 
 ---
 
-A simple calculator built using vanilla HTML, CSS and JavaScript.
+A simple calculator built using vanilla HTML, CSS and JavaScript..
 
 ## Controls / Functionality
 
