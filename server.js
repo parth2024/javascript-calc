@@ -13,7 +13,7 @@ const START_TIME = Date.now();
 // etc.) This is NOT a leak — it's allocated once at boot and kept for the
 // life of the process, same as any real app's warm caches.
 // ---------------------------------------------------------------------------
-const BOOT_DATASET_MB = parseInt(process.env.BOOT_DATASET_MB || "40", 10);
+const BOOT_DATASET_MB = parseInt(process.env.BOOT_DATASET_MB || "48", 10);
 
 function buildBootDataset(totalMb) {
   const recordSize = 1024; // ~1KB per "record"
