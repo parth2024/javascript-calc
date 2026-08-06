@@ -8,7 +8,7 @@
 
 A simple calculator built using vanilla HTML, CSS and JavaScript..
 
-## Controls / Functionality
+## Controls / Functionalityy
 
 - Can be controlled using either mouse / touchscreen or by using the keyboard pressing the corresponding keys.
 
