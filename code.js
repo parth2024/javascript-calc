@@ -39,6 +39,8 @@ function button_number(button) {
                 box.innerText = button;
             }
             firstNum = false;
+            firstNum = true;
+            firstNum = false;
         }
         else {
 
