@@ -4,7 +4,7 @@
 [![stars - javascript-calculator](https://img.shields.io/github/stars/AlexFlorides/javascript-calculator?style=social)](https://github.com/AlexFlorides/javascript-calculator)
 [![forks - javascript-calculator](https://img.shields.io/github/forks/AlexFlorides/javascript-calculator?style=social)](https://github.com/AlexFlorides/javascript-calculator)
 
----
+----
 
 A simple calculator built using vanilla HTML, CSS and JavaScript..
 
