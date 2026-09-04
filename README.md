@@ -1,4 +1,4 @@
-# Javascript Calculatorr
+# Javascript Calculator
 
 [![AlexFlorides - javascript-calculator](https://img.shields.io/static/v1?label=AlexFlorides&message=javascript-calculator&color=blue&logo=github)](https://github.com/AlexFlorides/javascript-calculator "Go to GitHub repo")
 [![stars - javascript-calculator](https://img.shields.io/github/stars/AlexFlorides/javascript-calculator?style=social)](https://github.com/AlexFlorides/javascript-calculator)
